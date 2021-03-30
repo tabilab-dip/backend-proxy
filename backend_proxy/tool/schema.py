@@ -1,15 +1,13 @@
 from marshmallow import Schema, fields
 
 
-class ToolSchema:
-    id = fields.Int(required=True)
+class ToolSchema(Schema):
     ip = fields.Str(required=True)
     port = fields.Int(required=True)
-    git = fields.URL()
-    input_specs_schema = fields.Str()
-    input_specs_schema = fields.Str()
-    input_specs_schema = fields.Str()
-    output_specs = fields.Str()
-    author_specs = fields.Str()
-    name = fields.Str()
-    enum = fields.Str()
+    git = fields.Str(required=True)
+    name = fields.Str(required=True)
+    # enum needs to be unique
+    enum = fields.Str(required=True)
+    author_json = fields.Str(required=True)  # ~~
+    root_json = fields.Str(required=True)  # ~~
+    form_data_json = fields.Str(required=True)  # ~~
