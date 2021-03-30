@@ -14,14 +14,18 @@ def add_tool():
         object_dict["author_json"] = author_json
         object_dict["root_json"] = root_json
         object_dict["form_data_json"] = form_data_json
-        ToolSchema().load(object_dict)
+        tool_schema = ToolSchema().load(object_dict)
         """
         TODO:
-        1- Get Schema dictionary
-        2- Check if its enum is unique
+        1- Read src
+        2- Check if its enum is unique (of tool_schema)
             2.1- Implement db Class
             2.2- Implement Tool Services which uses the db Class; Check uniqueness
         3- If all fine return 200
+        4- Final test
+            - Incrementally add folders/files to morp_sak
+            - Try with frontend forms (at each increment too)
+            - 
         """
         logs = ""
         response = dict({"title": "Tool is added to the proxy",
