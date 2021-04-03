@@ -18,7 +18,7 @@ def add_tool():
         """
         TODO:
         1- Read src
-        2- Check if its enum is unique (of tool_schema)
+        2- Check if dict's enum is unique (of tool_schema)
             2.1- Implement db Class
             2.2- Implement Tool Services which uses the db Class; Check uniqueness
         3- If all fine return 200
