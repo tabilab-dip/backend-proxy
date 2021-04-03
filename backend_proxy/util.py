@@ -8,6 +8,10 @@ import subprocess
 KEYWORDS = ["panel", "about", "home", "test", ""]
 
 
+def conll2standoff(conll):
+    raise NotImplementedError
+
+
 def get_specs_from_git(git_url):
     dname = "".join(random.choices(string.ascii_letters, k=10))
     p = subprocess.run(["git", "clone", git_url, dname])

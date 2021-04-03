@@ -2,7 +2,7 @@ from flask import Flask, json, g, request, jsonify, json
 from backend_proxy.tool.schema import ToolSchema
 from backend_proxy.tool.service import Service
 from backend_proxy.db.mongoDB import MongoDB
-from util import *
+from backend_proxy.util import *
 
 app = Flask(__name__)
 

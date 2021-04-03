@@ -1,6 +1,6 @@
 from backend_proxy.db.mongoDB import MongoDB
 from backend_proxy.tool.schema import ToolSchema
-from backend_proxy.api.util import *
+from backend_proxy.util import *
 import requests
 
 
@@ -58,8 +58,12 @@ class Service:
             raise Exception("Tool with enum: {} does not exist".format(enum))
         tool_dict = self.dump(tool_dict)
         ip, port = tool_dict["ip"], tool_dict["port"]
-        response = self.run_request(ip, port, input_dict)
-        return response.json()
+        response = self.run_request(ip, port, input_dict).json()
+        if "brat_conll" in response:
+            standoff = conll2standoff(response["brat_conll"])
+            response["brat_standoff"] = standoff
+            del response["brat_conll"]
+        return response
 
     def list_all_tools(self):
         tools = self.db.find_all()
