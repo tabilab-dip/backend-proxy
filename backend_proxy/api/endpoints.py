@@ -1,10 +1,23 @@
 from flask import Flask, json, g, request, jsonify, json
 from backend_proxy.tool.schema import ToolSchema
+from backend_proxy.tool.service import Service
+from backend_proxy.db.mongoDB import MongoDB
 from util import *
+
 app = Flask(__name__)
 
 
-@app.route("/api/tools/add", methods=["POST"])
+@app.route("/api/tools", methods=["GET"])
+def list_all_tools():
+    pass
+
+
+@app.route("/api/tools/name", methods=["GET"])
+def get_tool_names():
+    pass
+
+
+@app.route("/api/tool", methods=["POST"])
 def add_tool():
     try:
         check_is_auth(request)
@@ -24,12 +37,34 @@ def add_tool():
     return json.dumps(response)
 
 
+@app.route("/api/tool", methods=["PUT"])
+def update_tool():
+    pass
+
+
+@app.route("/api/tool/<enum>", methods=["DELETE"])
+def delete_tool():
+    pass
+
+
+@app.route("/api/tool/ui/<enum>", methods=["GET"])
+def get_tool_ui_info():
+    pass
+
+
+@app.route("/api/tool/run/<enum>", methods=["POST"])
+def run_tool():
+    pass
+
+
 """
 list endpoints:
+Step 0 - Move logic etc to service
 Step 1 - Dynamic System:
 1- POST: add_tool:
     given a tool description, add it to the database; the tool's enum must be unique
-2- GET: list all tools with all of their information
+2- GET: list_all_tools 
+    list all with all of their information
     return all of the tools with all of their information
 3- UPDATE: update_tool:
     given a tool description, find the one with the same enum, and update it
