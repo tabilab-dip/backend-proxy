@@ -1,6 +1,6 @@
 from backend_proxy.db.mongoDB import MongoDB
 from backend_proxy.tool.schema import ToolSchema
-from backend_proxy.util import *
+from backend_proxy.misc.util import *
 import requests
 
 

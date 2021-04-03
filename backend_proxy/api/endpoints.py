@@ -2,7 +2,7 @@ from flask import Flask, json, g, request, jsonify, json
 from backend_proxy.tool.schema import ToolSchema
 from backend_proxy.tool.service import Service
 from backend_proxy.db.mongoDB import MongoDB
-from backend_proxy.util import *
+from backend_proxy.misc.util import *
 
 app = Flask(__name__)
 
@@ -117,9 +117,10 @@ Step 1 - Dynamic System:
 Step 2 - Authentication:
 1- Login
     - required endpoints for authentication, and update the existing endpoints to check for that.
+    - update password etc.
+    - timely session
+    - update DB class to load initial passwd from OS environ variable
 
 """
-
-
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
