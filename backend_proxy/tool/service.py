@@ -19,7 +19,7 @@ class Service:
         req_dict["root_json"] = root_json
         req_dict["form_data_json"] = form_data_json
         self.db.create(req_dict)
-        return req_dict
+        return self.dump(req_dict)
 
     def update_tool(self, req_dict, original_enum):
         enum = req_dict["enum"]
@@ -34,15 +34,14 @@ class Service:
         req_dict["root_json"] = root_json
         req_dict["form_data_json"] = form_data_json
         self.db.update({"enum": original_enum}, req_dict)
-        return req_dict
+        return self.dump(req_dict)
 
     def delete_tool(self, enum):
         tool_dict = self.db.find({"enum": enum})
         if tool_dict is None:
             raise Exception("Tool enum does not exist")
         self.db.delete(tool_dict)
-        tool_dict = self.dump(tool_dict)
-        return tool_dict
+        return self.dump(tool_dict)
 
     def get_tool_ui_info(self, enum):
         tool_dict = self.db.find({"enum": enum})

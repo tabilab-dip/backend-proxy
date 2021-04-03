@@ -2,6 +2,7 @@ from marshmallow import Schema, fields
 
 
 class ToolSchema(Schema):
+    _id = fields.Int(required=True)
     ip = fields.Str(required=True)
     port = fields.Int(required=True)
     git = fields.Str(required=True)

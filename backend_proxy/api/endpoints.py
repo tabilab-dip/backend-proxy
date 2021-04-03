@@ -3,6 +3,7 @@ from backend_proxy.tool.schema import ToolSchema
 from backend_proxy.tool.service import Service
 from backend_proxy.db.mongoDB import MongoDB
 from backend_proxy.misc.util import *
+import traceback
 
 app = Flask(__name__)
 
@@ -12,6 +13,7 @@ def list_all_tools():
     try:
         response = Service().list_all_tools()
     except Exception as e:
+        traceback.print_exc()
         response = dict({"title": "500; Server Error",
                          "subTitle": "Logs: {}".format(str(e))})
     return json.dumps(response)
@@ -35,13 +37,14 @@ def add_tool():
         response = dict({"title": "Tool is added to the proxy",
                          "subTitle": "Tool Info: {}".format(json.dumps(req_dict))})
     except Exception as e:
+        traceback.print_exc()
         response = dict({"title": "500; Server Error",
                          "subTitle": "Logs: {}".format(str(e))})
     return json.dumps(response)
 
 
 @app.route("/api/tool/<enum>", methods=["PUT"])
-def update_tool():
+def update_tool(enum):
     try:
         req_dict = json.loads(request.data)
         req_dict = Service().update_tool(req_dict, enum)
@@ -54,7 +57,7 @@ def update_tool():
 
 
 @app.route("/api/tool/<enum>", methods=["DELETE"])
-def delete_tool():
+def delete_tool(enum):
     try:
         tool_json = Service().delete_tool(enum)
         response = dict({"title": "Tool is deleted",
@@ -66,7 +69,7 @@ def delete_tool():
 
 
 @app.route("/api/tool/ui/<enum>", methods=["GET"])
-def get_tool_ui_info():
+def get_tool_ui_info(enum):
     try:
         response = Service().get_tool_ui_info(enum)
     except Exception as e:
@@ -76,7 +79,7 @@ def get_tool_ui_info():
 
 
 @app.route("/api/tool/run/<enum>", methods=["POST"])
-def run_tool():
+def run_tool(enum):
     try:
         # input for the tool
         input_dict = json.loads(request.data)

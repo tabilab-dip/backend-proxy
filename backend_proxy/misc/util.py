@@ -15,7 +15,7 @@ def conll2standoff(conll):
 def get_specs_from_git(git_url):
     dname = "".join(random.choices(string.ascii_letters, k=10))
     p = subprocess.run(["git", "clone", git_url, dname])
-    if p != 0:
+    if p.returncode != 0:
         raise Exception("Git clone is not successfull. Check the git URL")
     # check if dip_specs folder exists
     if not os.path.isdir("{}/dip_specs".format(dname)):
@@ -30,6 +30,7 @@ def get_specs_from_git(git_url):
         with open("{}/dip_specs/{}".format(dname, fname), "r") as f:
             json_dict = json.load(f)
         jsons.append(json_dict)
+    subprocess.run(["rm", "-rf", dname])
     return jsons
 
 
