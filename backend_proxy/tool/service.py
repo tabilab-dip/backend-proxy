@@ -1,6 +1,7 @@
 from backend_proxy.db.mongoDB import MongoDB
 from backend_proxy.tool.schema import ToolSchema
 from backend_proxy.api.util import *
+import requests
 
 
 class Service:
@@ -51,8 +52,14 @@ class Service:
             "author_json", "root_json", "form_data_json")).dump(tool_dict)
         return tool_dict
 
-    def run_tool(self, enum):
-        raise NotImplementedError
+    def run_tool(self, enum, input_dict):
+        tool_dict = self.db.find({"enum": enum})
+        if tool_dict is None:
+            raise Exception("Tool with enum: {} does not exist".format(enum))
+        tool_dict = self.dump(tool_dict)
+        ip, port = tool_dict["ip"], tool_dict["port"]
+        response = self.run_request(ip, port, input_dict)
+        return response.json()
 
     def list_all_tools(self):
         tools = self.db.find_all()
@@ -67,3 +74,8 @@ class Service:
 
     def dump(self, obj):
         return ToolSchema(exclude=['_id']).dump(obj)
+
+    def run_request(self, ip, port, input_dict):
+        # all running programs must implement /evaluate endpoint
+        addr = "http://{}:{}/evaluate".format(ip, port)
+        return requests.post(addr, data=input_dict)
