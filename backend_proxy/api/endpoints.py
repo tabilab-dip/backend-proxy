@@ -9,52 +9,80 @@ app = Flask(__name__)
 
 @app.route("/api/tools", methods=["GET"])
 def list_all_tools():
-    pass
-
-
-@app.route("/api/tools/name", methods=["GET"])
-def get_tool_names():
-    pass
-
-
-@app.route("/api/tool", methods=["POST"])
-def add_tool():
     try:
-        check_is_auth(request)
-        object_dict = json.loads(request.data)
-        git_url = object_dict["git"]
-        author_json, form_data_json, root_json = get_specs_from_git(git_url)
-        object_dict["author_json"] = author_json
-        object_dict["root_json"] = root_json
-        object_dict["form_data_json"] = form_data_json
-        tool_schema = ToolSchema().load(object_dict)
-        logs = ""
-        response = dict({"title": "Tool is added to the proxy",
-                         "subTitle": "Logs: {}".format(logs)})
+        response = Service().list_all_tools()
     except Exception as e:
         response = dict({"title": "500; Server Error",
                          "subTitle": "Logs: {}".format(str(e))})
     return json.dumps(response)
 
 
-@app.route("/api/tool", methods=["PUT"])
+@app.route("/api/tools/name", methods=["GET"])
+def get_tool_names():
+    try:
+        response = Service().get_tool_names()
+    except Exception as e:
+        response = dict({"title": "500; Server Error",
+                         "subTitle": "Logs: {}".format(str(e))})
+    return json.dumps(response)
+
+
+@app.route("/api/tool", methods=["POST"])
+def add_tool():
+    try:
+        req_dict = json.loads(request.data)
+        req_dict = Service().add_tool(req_dict)
+        response = dict({"title": "Tool is added to the proxy",
+                         "subTitle": "Tool Info: {}".format(json.dumps(req_dict))})
+    except Exception as e:
+        response = dict({"title": "500; Server Error",
+                         "subTitle": "Logs: {}".format(str(e))})
+    return json.dumps(response)
+
+
+@app.route("/api/tool/<enum>", methods=["PUT"])
 def update_tool():
-    pass
+    try:
+        req_dict = json.loads(request.data)
+        req_dict = Service().update_tool(req_dict, enum)
+        response = dict({"title": "Tool is updated",
+                         "subTitle": "Tool Info: {}".format(json.dumps(req_dict))})
+    except Exception as e:
+        response = dict({"title": "500; Server Error",
+                         "subTitle": "Logs: {}".format(str(e))})
+    return json.dumps(response)
 
 
 @app.route("/api/tool/<enum>", methods=["DELETE"])
 def delete_tool():
-    pass
+    try:
+        tool_json = Service().delete_tool(enum)
+        response = dict({"title": "Tool is deleted",
+                         "subTitle": "Tool Info: {}".format(json.dumps(tool_json))})
+    except Exception as e:
+        response = dict({"title": "500; Server Error",
+                         "subTitle": "Logs: {}".format(str(e))})
+    return json.dumps(response)
 
 
 @app.route("/api/tool/ui/<enum>", methods=["GET"])
 def get_tool_ui_info():
-    pass
+    try:
+        response = Service().get_tool_ui_info(enum)
+    except Exception as e:
+        response = dict({"title": "500; Server Error",
+                         "subTitle": "Logs: {}".format(str(e))})
+    return json.dumps(response)
 
 
 @app.route("/api/tool/run/<enum>", methods=["POST"])
 def run_tool():
-    pass
+    try:
+        response = Service().run_tool(enum)
+    except Exception as e:
+        response = dict({"title": "500; Server Error",
+                         "subTitle": "Logs: {}".format(str(e))})
+    return json.dumps(response)
 
 
 """

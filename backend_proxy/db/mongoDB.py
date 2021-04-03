@@ -9,8 +9,8 @@ class MongoDB(object):
         # TODO: use local db for now
         self.db = MongoClient(host="localhost", port=27017).tools
 
-    def find_all(self, query):
-        return self.db.tools.find(query)
+    def find_all(self):
+        return self.db.tools.find({})
 
     def find(self, query):
         return self.db.tools.find_one(query)
