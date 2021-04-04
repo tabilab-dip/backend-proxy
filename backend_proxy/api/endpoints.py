@@ -11,22 +11,26 @@ app = Flask(__name__)
 @app.route("/api/tools", methods=["GET"])
 def list_all_tools():
     try:
-        response = Service().list_all_tools()
+        data = Service().list_all_tools()
+        status = 200
     except Exception as e:
         traceback.print_exc()
-        response = dict({"title": "500; Server Error",
-                         "subTitle": "Logs: {}".format(str(e))})
-    return json.dumps(response)
+        data = dict({"title": "500; Server Error",
+                     "subTitle": "Logs: {}".format(str(e))})
+        status = 500
+    return get_response_json(data, status)
 
 
 @app.route("/api/tools/name", methods=["GET"])
 def get_tool_names():
     try:
-        response = Service().get_tool_names()
+        data = Service().get_tool_names()
+        status = 200
     except Exception as e:
-        response = dict({"title": "500; Server Error",
-                         "subTitle": "Logs: {}".format(str(e))})
-    return json.dumps(response)
+        data = dict({"title": "500; Server Error",
+                     "subTitle": "Logs: {}".format(str(e))})
+        status = 500
+    return get_response_json(data, status)
 
 
 @app.route("/api/tool", methods=["POST"])
@@ -34,13 +38,15 @@ def add_tool():
     try:
         req_dict = json.loads(request.data)
         req_dict = Service().add_tool(req_dict)
-        response = dict({"title": "Tool is added to the proxy",
-                         "subTitle": "Tool Info: {}".format(json.dumps(req_dict))})
+        data = dict({"title": "Tool is added to the proxy",
+                     "subTitle": "Tool Info: {}".format(json.dumps(req_dict))})
+        status = 200
     except Exception as e:
         traceback.print_exc()
-        response = dict({"title": "500; Server Error",
-                         "subTitle": "Logs: {}".format(str(e))})
-    return json.dumps(response)
+        data = dict({"title": "500; Server Error",
+                     "subTitle": "Logs: {}".format(str(e))})
+        status = 500
+    return get_response_json(data, status)
 
 
 @app.route("/api/tool/<enum>", methods=["PUT"])
@@ -48,34 +54,40 @@ def update_tool(enum):
     try:
         req_dict = json.loads(request.data)
         req_dict = Service().update_tool(req_dict, enum)
-        response = dict({"title": "Tool is updated",
-                         "subTitle": "Tool Info: {}".format(json.dumps(req_dict))})
+        data = dict({"title": "Tool is updated",
+                     "subTitle": "Tool Info: {}".format(json.dumps(req_dict))})
+        status = 200
     except Exception as e:
-        response = dict({"title": "500; Server Error",
-                         "subTitle": "Logs: {}".format(str(e))})
-    return json.dumps(response)
+        data = dict({"title": "500; Server Error",
+                     "subTitle": "Logs: {}".format(str(e))})
+        status = 500
+    return get_response_json(data, status)
 
 
 @app.route("/api/tool/<enum>", methods=["DELETE"])
 def delete_tool(enum):
     try:
         tool_json = Service().delete_tool(enum)
-        response = dict({"title": "Tool is deleted",
-                         "subTitle": "Tool Info: {}".format(json.dumps(tool_json))})
+        data = dict({"title": "Tool is deleted",
+                     "subTitle": "Tool Info: {}".format(json.dumps(tool_json))})
+        status = 200
     except Exception as e:
-        response = dict({"title": "500; Server Error",
-                         "subTitle": "Logs: {}".format(str(e))})
-    return json.dumps(response)
+        data = dict({"title": "500; Server Error",
+                     "subTitle": "Logs: {}".format(str(e))})
+        status = 500
+    return get_response_json(data, status)
 
 
 @app.route("/api/tool/ui/<enum>", methods=["GET"])
 def get_tool_ui_info(enum):
     try:
-        response = Service().get_tool_ui_info(enum)
+        data = Service().get_tool_ui_info(enum)
+        status = 200
     except Exception as e:
-        response = dict({"title": "500; Server Error",
-                         "subTitle": "Logs: {}".format(str(e))})
-    return json.dumps(response)
+        data = dict({"title": "500; Server Error",
+                     "subTitle": "Logs: {}".format(str(e))})
+        status = 500
+    return get_response_json(data, status)
 
 
 @app.route("/api/tool/run/<enum>", methods=["POST"])
@@ -84,12 +96,18 @@ def run_tool(enum):
     try:
         # input for the tool
         input_dict = json.loads(request.data)
-        response = Service().run_tool(enum, input_dict)
+        data = Service().run_tool(enum, input_dict)
+        status = 200
     except Exception as e:
         traceback.print_exc()
-        response = dict({"title": "500; Server Error",
-                         "subTitle": "Logs: {}".format(str(e))})
-    return json.dumps(response)
+        data = dict({"title": "500; Server Error",
+                     "subTitle": "Logs: {}".format(str(e))})
+        status = 500
+    return get_response_json(data, status)
+
+
+def get_response_json(data, status):
+    return (json.dumps(data), status, {'content-type': 'application/json'})
 
 
 """

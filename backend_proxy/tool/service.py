@@ -67,7 +67,9 @@ class Service:
 
     def list_all_tools(self):
         tools = self.db.find_all()
-        return [self.dump(tool) for tool in tools]
+        return [ToolSchema(only=("enum", "name", "ip", "port", "git"))
+                .dump(tool)
+                for tool in tools]
 
     def get_tool_names(self):
         tools = self.db.find_all()

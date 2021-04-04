@@ -19,6 +19,7 @@ def get_specs_from_git(git_url):
         raise Exception("Git clone is not successfull. Check the git URL")
     # check if dip_specs folder exists
     if not os.path.isdir("{}/dip_specs".format(dname)):
+        subprocess.run(["rm", "-rf", dname])
         raise Exception("The project does not contain the folder dip_specs. "
                         "Fix the project's root according to the tutorial")
     # read the 4 files:
@@ -26,6 +27,7 @@ def get_specs_from_git(git_url):
     jsons = []
     for fname in fnames:
         if not os.path.isfile("{}/dip_specs/{}".format(dname, fname)):
+            subprocess.run(["rm", "-rf", dname])
             raise Exception("{} file is missing in the project".format(fname))
         with open("{}/dip_specs/{}".format(dname, fname), "r") as f:
             json_dict = json.load(f)
