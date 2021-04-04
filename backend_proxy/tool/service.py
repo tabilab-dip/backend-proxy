@@ -81,4 +81,4 @@ class Service:
     def run_request(self, ip, port, input_dict):
         # all running programs must implement /evaluate endpoint
         addr = "http://{}:{}/evaluate".format(ip, port)
-        return requests.post(addr, data=input_dict)
+        return requests.post(addr, json=input_dict)

@@ -80,11 +80,13 @@ def get_tool_ui_info(enum):
 
 @app.route("/api/tool/run/<enum>", methods=["POST"])
 def run_tool(enum):
+    print("halooo")
     try:
         # input for the tool
         input_dict = json.loads(request.data)
         response = Service().run_tool(enum, input_dict)
     except Exception as e:
+        traceback.print_exc()
         response = dict({"title": "500; Server Error",
                          "subTitle": "Logs: {}".format(str(e))})
     return json.dumps(response)
