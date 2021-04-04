@@ -1,6 +1,7 @@
 from backend_proxy.db.mongoDB import MongoDB
 from backend_proxy.tool.schema import ToolSchema
-from backend_proxy.misc.util import *
+import backend_proxy.misc.util as util
+import backend_proxy.misc.conllXtostandoff as conllXtostandoff
 import requests
 
 
@@ -13,7 +14,7 @@ class Service:
         if self.enum_exists(enum):
             raise Exception("The enum: {} already exists, "
                             "enter a unique one".format(enum))
-        author_json, form_data_json, root_json = get_specs_from_git(
+        author_json, form_data_json, root_json = util.get_specs_from_git(
             req_dict["git"])
         req_dict["author_json"] = author_json
         req_dict["root_json"] = root_json
@@ -28,7 +29,7 @@ class Service:
                             "enter a unique one".format(enum))
         # Reloads the git URL again since
         #   this might be the main motivation of the update
-        author_json, form_data_json, root_json = get_specs_from_git(
+        author_json, form_data_json, root_json = util.get_specs_from_git(
             req_dict["git"])
         req_dict["author_json"] = author_json
         req_dict["root_json"] = root_json
@@ -59,7 +60,7 @@ class Service:
         ip, port = tool_dict["ip"], tool_dict["port"]
         response = self.run_request(ip, port, input_dict).json()
         if "brat_conll" in response:
-            standoff = conll2standoff(response["brat_conll"])
+            standoff = conllXtostandoff.process(response["brat_conll"])
             response["brat_standoff"] = standoff
             del response["brat_conll"]
         return response
