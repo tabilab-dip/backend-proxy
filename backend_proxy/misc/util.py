@@ -8,13 +8,17 @@ import subprocess
 KEYWORDS = ["panel", "about", "home", "test", ""]
 
 
-def conll2standoff(conll):
-    raise NotImplementedError
-
-
 def get_specs_from_git(git_url):
-    dname = "".join(random.choices(string.ascii_letters, k=10))
-    p = subprocess.run(["git", "clone", git_url, dname])
+    lind = git_url.rfind("/")
+    rind = git_url.rfind(".")
+    dname = git_url[lind+1: rind]
+    dname = "backups/{}".format(dname)
+    # check if folder exists, if so, delete it
+    if not os.path.isdir("backups"):
+        os.mkdir("backups")
+    if os.path.isdir(dname):
+        subprocess.run(["rm", "-rf", dname])
+    p = subprocess.run(["git", "clone", "--depth", "1", git_url, dname])
     if p.returncode != 0:
         raise Exception("Git clone is not successfull. Check the git URL")
     # check if dip_specs folder exists
@@ -32,7 +36,6 @@ def get_specs_from_git(git_url):
         with open("{}/dip_specs/{}".format(dname, fname), "r") as f:
             json_dict = json.load(f)
         jsons.append(json_dict)
-    subprocess.run(["rm", "-rf", dname])
     return jsons
 
 

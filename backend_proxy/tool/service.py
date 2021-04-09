@@ -1,8 +1,11 @@
 from backend_proxy.db.mongoDB import MongoDB
-from backend_proxy.tool.schema import ToolSchema
+from backend_proxy.tool.schema import ToolSchema, dtime_format
 import backend_proxy.misc.util as util
 import backend_proxy.misc.conllXtostandoff as conllXtostandoff
+import datetime as dt
 import requests
+
+# dt.datetime.now()
 
 
 class Service:
@@ -19,6 +22,7 @@ class Service:
         req_dict["author_json"] = author_json
         req_dict["root_json"] = root_json
         req_dict["form_data_json"] = form_data_json
+        req_dict["update_time"] = dt.datetime.now()
         self.db.create(req_dict)
         return self.dump(req_dict)
 
@@ -34,6 +38,7 @@ class Service:
         req_dict["author_json"] = author_json
         req_dict["root_json"] = root_json
         req_dict["form_data_json"] = form_data_json
+        req_dict["update_time"] = dt.datetime.now()
         self.db.update({"enum": original_enum}, req_dict)
         return self.dump(req_dict)
 
@@ -67,7 +72,7 @@ class Service:
 
     def list_all_tools(self):
         tools = self.db.find_all()
-        return [ToolSchema(only=("enum", "name", "ip", "port", "git"))
+        return [ToolSchema(only=("enum", "name", "ip", "port", "git", "update_time"))
                 .dump(tool)
                 for tool in tools]
 
