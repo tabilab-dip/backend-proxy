@@ -19,10 +19,15 @@ class Service:
                             "enter a unique one".format(enum))
         author_json, form_data_json, root_json = util.get_specs_from_git(
             req_dict["git"])
-        req_dict["author_json"] = author_json
+        if "author_json" not in req_dict or not req_dict["author_json"]:
+            print("qqqqqqqqq")
+            req_dict["author_json"] = author_json
         req_dict["root_json"] = root_json
         req_dict["form_data_json"] = form_data_json
         req_dict["update_time"] = dt.datetime.now()
+        # copy contact info to separate variable
+        if "contact_info" in req_dict["author_json"]:
+            req_dict["contact_info"] = req_dict["author_json"]["contact_info"]
         self.db.create(req_dict)
         return self.dump(req_dict)
 
@@ -35,10 +40,16 @@ class Service:
         #   this might be the main motivation of the update
         author_json, form_data_json, root_json = util.get_specs_from_git(
             req_dict["git"])
+        if "author_json" not in req_dict or not req_dict["author_json"]:
+            print("qqqqqqqqq")
+            req_dict["author_json"] = author_json
         req_dict["author_json"] = author_json
         req_dict["root_json"] = root_json
         req_dict["form_data_json"] = form_data_json
         req_dict["update_time"] = dt.datetime.now()
+        # copy contact info to separate variable
+        if "contact_info" in req_dict["author_json"]:
+            req_dict["contact_info"] = req_dict["author_json"]["contact_info"]
         self.db.update({"enum": original_enum}, req_dict)
         return self.dump(req_dict)
 
@@ -72,7 +83,8 @@ class Service:
 
     def list_all_tools(self):
         tools = self.db.find_all()
-        return [ToolSchema(only=("enum", "name", "ip", "port", "git", "update_time"))
+        return [ToolSchema(only=("enum", "name", "ip", "port", "git",
+                                 "update_time", "author_json", "contact_info"))
                 .dump(tool)
                 for tool in tools]
 
