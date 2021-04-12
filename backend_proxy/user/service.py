@@ -8,3 +8,15 @@ import requests
 class UserService:
     def __init__(self):
         self.db = MongoDB()
+
+    def login_user(self, req_dict):
+        pass
+
+    def logout_user(self, token):
+        pass
+
+    def register_user(self, req_dict):
+        pass
+
+    def update_user(self, req_dict, token):
+        pass
