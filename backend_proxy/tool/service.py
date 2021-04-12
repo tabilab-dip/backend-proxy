@@ -6,9 +6,9 @@ import datetime as dt
 import requests
 
 
-class ToolService:
+class Service:
     def __init__(self):
-        self.db = MongoDB()
+        self.db = MongoDB("tool")
 
     def add_tool(self, req_dict):
         enum = req_dict["enum"]
