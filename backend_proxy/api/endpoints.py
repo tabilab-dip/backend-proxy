@@ -1,6 +1,6 @@
 from flask import Flask, json, g, request, jsonify, json
 from backend_proxy.tool.schema import ToolSchema
-from backend_proxy.tool.service import Service
+from backend_proxy.tool.service import ToolService
 from backend_proxy.db.mongoDB import MongoDB
 from backend_proxy.misc.util import *
 import traceback
@@ -11,7 +11,7 @@ app = Flask(__name__)
 @app.route("/api/tools", methods=["GET"])
 def list_all_tools():
     try:
-        data = Service().list_all_tools()
+        data = ToolService().list_all_tools()
         status = 200
     except Exception as e:
         traceback.print_exc()
@@ -24,7 +24,7 @@ def list_all_tools():
 @app.route("/api/tools/name", methods=["GET"])
 def get_tool_names():
     try:
-        data = Service().get_tool_names()
+        data = ToolService().get_tool_names()
         status = 200
     except Exception as e:
         data = dict({"title": "500; Server Error",
@@ -37,7 +37,7 @@ def get_tool_names():
 def add_tool():
     try:
         req_dict = json.loads(request.data)
-        req_dict = Service().add_tool(req_dict)
+        req_dict = ToolService().add_tool(req_dict)
         data = dict({"title": "Tool is added to the proxy",
                      "subTitle": "Tool Info: {}".format(json.dumps(req_dict))})
         status = 200
@@ -53,7 +53,7 @@ def add_tool():
 def update_tool(enum):
     try:
         req_dict = json.loads(request.data)
-        req_dict = Service().update_tool(req_dict, enum)
+        req_dict = ToolService().update_tool(req_dict, enum)
         data = dict({"title": "Tool is updated",
                      "subTitle": "Tool Info: {}".format(json.dumps(req_dict))})
         status = 200
@@ -67,7 +67,7 @@ def update_tool(enum):
 @app.route("/api/tool/<enum>", methods=["DELETE"])
 def delete_tool(enum):
     try:
-        tool_json = Service().delete_tool(enum)
+        tool_json = ToolService().delete_tool(enum)
         data = dict({"title": "Tool is deleted",
                      "subTitle": "Tool Info: {}".format(json.dumps(tool_json))})
         status = 200
@@ -81,7 +81,7 @@ def delete_tool(enum):
 @app.route("/api/tool/ui/<enum>", methods=["GET"])
 def get_tool_ui_info(enum):
     try:
-        data = Service().get_tool_ui_info(enum)
+        data = ToolService().get_tool_ui_info(enum)
         status = 200
     except Exception as e:
         data = dict({"title": "500; Server Error",
@@ -96,7 +96,7 @@ def run_tool(enum):
     try:
         # input for the tool
         input_dict = json.loads(request.data)
-        data = Service().run_tool(enum, input_dict)
+        data = ToolService().run_tool(enum, input_dict)
         status = 200
     except Exception as e:
         traceback.print_exc()

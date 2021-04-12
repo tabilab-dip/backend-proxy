@@ -5,10 +5,8 @@ import backend_proxy.misc.conllXtostandoff as conllXtostandoff
 import datetime as dt
 import requests
 
-# dt.datetime.now()
 
-
-class Service:
+class ToolService:
     def __init__(self):
         self.db = MongoDB()
 
