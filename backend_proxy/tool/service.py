@@ -29,7 +29,11 @@ class Service:
         self.db.create(req_dict)
         return self.dump(req_dict)
 
-    def update_tool(self, req_dict, original_enum):
+    # update_tool(req_dict, enum, access_tools)
+    def update_tool(self, req_dict, original_enum, access_tools):
+        if original_enum not in access_tools:
+            raise Exception("You have no right to update this tool")
+
         enum = req_dict["enum"]
         if self.enum_exists(enum) and (enum != original_enum):
             raise Exception("The enum: {} already exists, "
@@ -51,7 +55,10 @@ class Service:
         self.db.update({"enum": original_enum}, req_dict)
         return self.dump(req_dict)
 
-    def delete_tool(self, enum):
+    def delete_tool(self, enum, access_tools):
+        if enum not in access_tools:
+            raise Exception("You have no right to update this tool")
+
         tool_dict = self.db.find({"enum": enum})
         if tool_dict is None:
             raise Exception("Tool enum does not exist")
@@ -79,12 +86,13 @@ class Service:
             del response["brat_conll"]
         return response
 
-    def list_all_tools(self):
+    def list_all_tools(self, access_tools):
+        access_tools = set(access_tools)
         tools = self.db.find_all()
         return [ToolSchema(only=("enum", "name", "ip", "port", "git",
                                  "update_time", "author_json", "contact_info"))
                 .dump(tool)
-                for tool in tools]
+                for tool in tools if tool in access_tools]
 
     def get_tool_names(self):
         tools = self.db.find_all()

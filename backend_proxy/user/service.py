@@ -16,7 +16,6 @@ class UserService:
         if user is None:
             raise Exception(
                 "User {} does not exist".format(req_dict["username"]))
-        password = req_dict["password"]
         if bcrypt.checkpw(req_dict["password"].encode('utf-8'), user["password"]):
             user["last_seen_at"] = dt.datetime.now()
             self.db.update({"username": user["username"]}, user)
@@ -30,8 +29,6 @@ class UserService:
         session_user = self.db.find({"username": session["username"]})
         if session_user is None or "admin" not in session_user["roles"]:
             raise Exception("You have no right to register a user.")
-
-        username = req_dict["username"]
         password = req_dict["password1"]
         if password != req_dict["password2"]:
             raise Exception("Password don't match.")
@@ -74,6 +71,14 @@ class UserService:
         self.db.update({"username": original_username}, target_user)
         return self.dump(target_user)
 
+    def add_tool_to_user(self, session, tool_enum):
+        self.assert_logged_in(session)
+        username = session["username"]
+        session_user = self.db.find({"username": username})
+        session_user["tools"].append(tool_enum)
+        self.db.update({"username": username}, session_user)
+        return self.dump(session_user)
+
     def get_current_user(self, session):
         self.assert_logged_in(session)
         session_user = self.db.find({"username": session["username"]})
@@ -94,11 +99,13 @@ class UserService:
             # None is special placeholder for all tools
             return None
         else:
-            return session_user["tools"]
+            tools = session_user["tools"]
+            tools = [] if tools is None else tools
+            return tools
 
     def assert_logged_in(self, session):
         if "username" not in session:
             raise("You are not logged in.")
 
     def dump(self, obj):
-        return UserSchema(exclude=['_id']).dump(obj)
+        return UserSchema(exclude=['_id', 'password']).dump(obj)

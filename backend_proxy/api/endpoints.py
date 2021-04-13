@@ -46,7 +46,7 @@ def get_tool_names():
 @app.route("/api/tool", methods=["POST"])
 def add_tool():
     try:
-        UserService().assert_auth(session)
+        UserService().assert_logged_in(session)
         req_dict = json.loads(request.data)
         req_dict = ToolService().add_tool(req_dict)
         UserService().add_tool_to_user(session, req_dict["enum"])

@@ -159,8 +159,7 @@ def process(text):
         # 8 DEPREL Dependency relation to the HEAD.
         fields = l.split('\t')
 
-        assert len(fields) == 10, "Format error on line %d in %s: expected 10 fields, got %d: %s" % (
-            ln, fn, len(fields), l)
+        assert len(fields) == 10
 
         ID, form, POS = fields[0], fields[1], fields[4]
         head, rel = fields[6], fields[7]
