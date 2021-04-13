@@ -37,9 +37,3 @@ def get_specs_from_git(git_url):
             json_dict = json.load(f)
         jsons.append(json_dict)
     return jsons
-
-
-def check_is_auth(request):
-    raise NotImplementedError
-    # raise Exception("Not Authenticated. You should login"
-    # "If you see that you can go to /login to authenticate")

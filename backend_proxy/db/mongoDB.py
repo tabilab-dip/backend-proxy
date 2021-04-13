@@ -4,10 +4,16 @@ from pymongo import MongoClient
 url = ""
 
 
-class MongoDB(object):
-    def __init__(self, col):
+class MongoConn:
+    def __init__(self):
         # TODO: use local db for now
+        # db name is "tools"
         self.db = MongoClient(host="localhost", port=27017).tools
+
+
+class MongoDB(object):
+    def __init__(self, conn, col):
+        self.db = conn.db
         self.col = col
 
     def find_all(self):
