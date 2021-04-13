@@ -7,12 +7,8 @@ import backend_proxy.misc.conllXtostandoff as conllXtostandoff
 import datetime as dt
 import requests
 
-# TODO: Right now, when tool enum changes the user's access get's disconnected to that tool;
-#           - put _id to each instead of enum, since id does not change at updates
-#               - in user.service add wrapper to convert enum <-> _id; init tools collection
 
-
-class Service:
+class ToolService:
     def __init__(self):
         cn = MongoConn()
         self.db = MongoDB(cn, "tool")
