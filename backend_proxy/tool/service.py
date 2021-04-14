@@ -11,7 +11,7 @@ import requests
 class ToolService:
     def __init__(self):
         cn = MongoConn()
-        self.db = MongoDB(cn, "tool")
+        self.db = MongoDB(cn, "tools")
 
     def add_tool(self, req_dict):
         enum = req_dict["enum"]
@@ -90,12 +90,12 @@ class ToolService:
 
     def list_all_tools(self, access_tools):
         tools = self.db.find_all()
-        access_tools = set(access_tools)
         if access_tools is None:
             return [ToolSchema(only=("enum", "name", "ip", "port", "git",
                                      "update_time", "author_json", "contact_info"))
                     .dump(tool) for tool in tools]
         else:
+            access_tools = set(access_tools)
             return [ToolSchema(only=("enum", "name", "ip", "port", "git",
                                      "update_time", "author_json", "contact_info"))
                     .dump(tool) for tool in tools if tool in access_tools]

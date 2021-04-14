@@ -93,8 +93,10 @@ class UserService:
     def get_current_user(self, session):
         self.assert_logged_in(session)
         session_user = self.db.find({"username": session["username"]})
+        if "admin" in session_user["roles"]:
+            session_user["tools"] = self.get_all_tool_enums()
         self.assert_still_exists(session_user, session)
-        self.dump(session_user)
+        return self.dump(session_user)
 
     def get_users(self, session):
         self.assert_logged_in(session)
@@ -136,3 +138,7 @@ class UserService:
     def ids_to_enums(self, ids):
         return [self.db_tools.find({"_id": ObjectId(id)})["enum"]
                 for id in ids]
+
+    def get_all_tool_enums(self):
+        all_tools = self.db_tools.find_all()
+        return [t["enum"] for t in all_tools]

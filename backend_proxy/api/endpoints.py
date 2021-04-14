@@ -1,4 +1,5 @@
 from flask import Flask, json, g, request, jsonify, json, session
+from flask_cors import CORS, cross_origin
 from backend_proxy.tool.schema import ToolSchema
 from backend_proxy.tool.service import ToolService
 from backend_proxy.user.service import UserService
@@ -11,9 +12,10 @@ import traceback
 app = Flask(__name__)
 app.permanent_session_lifetime = timedelta(days=5)
 app.secret_key = "TODO"
-
-
+CORS(app, supports_credentials=True)
 # Auth is needed and roles specify the output
+
+
 @app.route("/api/tools", methods=["GET"])
 def list_all_tools():
     try:
@@ -131,6 +133,7 @@ def run_tool(enum):
 
 
 @app.route("/api/user/login", methods=["POST"])
+# @cross_origin(supports_credentials=True)
 def login_user():
     session.clear()
     try:
@@ -139,6 +142,31 @@ def login_user():
         # login succeeded gen session
         session["username"] = user["username"]
         data = dict({"title": "Login success", })
+        status = 200
+    except REST_Exception as e:
+        data = dict({"title": "Server Error",
+                     "subTitle": "Logs: {}".format(str(e))})
+        status = e.status
+    return get_response_json(data, status)
+
+
+@app.route("/api/user/", methods=["GET"])
+def get_user():
+    try:
+        data = UserService().get_current_user(session)
+        status = 200
+    except REST_Exception as e:
+        data = dict({"title": "Server Error",
+                     "subTitle": "Logs: {}".format(str(e))})
+        status = e.status
+    return get_response_json(data, status)
+
+
+@app.route("/api/user/isauth", methods=["GET"])
+def isauth_user():
+    try:
+        UserService().assert_logged_in(session)
+        data = dict({"title": "Authenticated", })
         status = 200
     except REST_Exception as e:
         data = dict({"title": "Server Error",
@@ -184,8 +212,19 @@ def update_user():
 
 
 def get_response_json(data, status):
-    return (json.dumps(data), status, {'content-type': 'application/json'})
+    # header = {
+    #    "content-type": "application/json",
+    #    # TODO update with original url
+    #    "Access-Control-Allow-Origin": "http://lvh.me:3000",
+    #    "Access-Control-Allow-Credentials": "true",
+    #    "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, x-auth"
+    # }
+    print(session, "SEEEEEEEEEEEEEEEESSSION")
+    print("RESPP: ", data)
+    # response = (json.dumps(data), status, header)
+    response = (json.dumps(data), status)
+    return response
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='localhost', port=5000)
