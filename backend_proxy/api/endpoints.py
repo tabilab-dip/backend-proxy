@@ -150,10 +150,35 @@ def login_user():
     return get_response_json(data, status)
 
 
-@app.route("/api/user/", methods=["GET"])
+@app.route("/api/user/<username>", methods=["DELETE"])
+def delete_user(username):
+    try:
+        UserService().delete_user(username, session)
+        data = dict({"title": "User is successfully deleted", })
+        status = 200
+    except REST_Exception as e:
+        data = dict({"title": "Server Error",
+                     "subTitle": "Logs: {}".format(str(e))})
+        status = e.status
+    return get_response_json(data, status)
+
+
+@app.route("/api/user", methods=["GET"])
 def get_user():
     try:
         data = UserService().get_current_user(session)
+        status = 200
+    except REST_Exception as e:
+        data = dict({"title": "Server Error",
+                     "subTitle": "Logs: {}".format(str(e))})
+        status = e.status
+    return get_response_json(data, status)
+
+
+@app.route("/api/users", methods=["GET"])
+def get_users():
+    try:
+        data = UserService().get_users(session)
         status = 200
     except REST_Exception as e:
         data = dict({"title": "Server Error",
@@ -197,11 +222,25 @@ def register_user():
     return get_response_json(data, status)
 
 
-@app.route("/api/user/update", methods=["POST"])
-def update_user():
+@app.route("/api/user/update", methods=["PUT"])
+def update_cur_user():
     try:
         req_dict = json.loads(request.data)
-        user = UserService().update_user(req_dict, session)
+        user = UserService().update_cur_user(req_dict, session)
+        data = dict({"title": "Update success", })
+        status = 200
+    except REST_Exception as e:
+        data = dict({"title": "Server Error",
+                     "subTitle": "Logs: {}".format(str(e))})
+        status = e.status
+    return get_response_json(data, status)
+
+
+@app.route("/api/user/update/<username>", methods=["PUT"])
+def update_other_user(username):
+    try:
+        req_dict = json.loads(request.data)
+        user = UserService().update_other_user(username, req_dict, session)
         data = dict({"title": "Update success", })
         status = 200
     except REST_Exception as e:
@@ -219,9 +258,6 @@ def get_response_json(data, status):
     #    "Access-Control-Allow-Credentials": "true",
     #    "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, x-auth"
     # }
-    print(session, "SEEEEEEEEEEEEEEEESSSION")
-    print("RESPP: ", data)
-    # response = (json.dumps(data), status, header)
     response = (json.dumps(data), status)
     return response
 

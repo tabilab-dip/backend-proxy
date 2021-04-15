@@ -35,6 +35,9 @@ class UserService:
         self.assert_still_exists(session_user, session)
         if "admin" not in session_user["roles"]:
             raise REST_Exception("You have no right to register a user.")
+        if self.db.find({"username": req_dict["username"]}) is not None:
+            raise REST_Exception(
+                "Username: {} already exists".format(req_dict["username"]))
         password = req_dict["password1"]
         if password != req_dict["password2"]:
             raise REST_Exception("Password don't match.")
@@ -48,36 +51,59 @@ class UserService:
         self.db.create(user)
         return self.dump(user)
 
-    def update_user(self, req_dict, session):
-        # either the admin or the user-itself
+    def delete_user(self, username, session):
         self.assert_logged_in(session)
-        username = session["username"]
-        session_user = self.db.find({"username": username})
+        session_user = self.db.find({"username": session["username"]})
         self.assert_still_exists(session_user, session)
-        if "admin" in session_user["roles"]:
-            original_username = req_dict["original_username"]
-            target_user = self.db.find({"username": original_username})
-            target_keys = ["email", "username", "roles"]
-        else:
-            target_user = session_user
-            target_keys = ["email", "username"]
-            original_username = target_user["username"]
-        if (original_username != req_dict["new_username"] and
-                self.db.find({"username": req_dict["new_username"]})):
-            raise REST_Exception("Username: {} already taken"
-                                 .format(req_dict["new_username"]))
+        if "admin" not in session_user["roles"]:
+            raise REST_Exception("You have no right to delete a user.")
+        self.db.delete({"username": username})
 
-        username = req_dict["new_username"]
-        password = req_dict["new_password1"]
-        if password != req_dict["new_password2"]:
+    def update_cur_user(self, req_dict, session):
+        self.assert_logged_in(session)
+        original_username = session["username"]
+        target_user = self.db.find({"username": original_username})
+        self.assert_still_exists(target_user, session)
+
+        target_keys = ["email", "username"]
+        if (original_username != req_dict["username"] and
+                self.db.find({"username": req_dict["username"]}) is not None):
+            raise REST_Exception("Username: {} already taken"
+                                 .format(req_dict["username"]))
+        password = req_dict["password1"]
+        if password != req_dict["password2"]:
             raise REST_Exception("Passwords don't match.")
         pass_hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         for key in target_keys:
             target_user[key] = req_dict[key]
         target_user["password"] = pass_hashed
         target_user["last_seen_at"] = dt.datetime.now()
-        if "admin" in session_user["roles"]:
-            target_user["tools"] = self.enums_to_ids(req_dict["tools"])
+        self.db.update({"username": original_username}, target_user)
+        session["username"] = req_dict["username"]
+        return self.dump(target_user)
+
+    def update_other_user(self, original_username, req_dict, session):
+        self.assert_logged_in(session)
+        session_user = self.db.find({"username": session["username"]})
+        if "admin" not in session_user["roles"]:
+            raise REST_Exception("You can't update others")
+        target_keys = ["email", "username"]
+        if (original_username != req_dict["username"] and
+                self.db.find({"username": req_dict["username"]}) is not None):
+            raise REST_Exception("Username: {} already taken"
+                                 .format(req_dict["username"]))
+
+        target_user = self.db.find({"username": original_username})
+        if "password1" in req_dict and req_dict["password1"]:
+            password = req_dict["password1"]
+            if password != req_dict["password2"]:
+                raise REST_Exception("Passwords don't match.")
+            pass_hashed = bcrypt.hashpw(
+                password.encode('utf-8'), bcrypt.gensalt())
+            target_user["password"] = pass_hashed
+
+        for key in target_keys:
+            target_user[key] = req_dict[key]
         self.db.update({"username": original_username}, target_user)
         return self.dump(target_user)
 
@@ -94,7 +120,7 @@ class UserService:
         self.assert_logged_in(session)
         session_user = self.db.find({"username": session["username"]})
         if "admin" in session_user["roles"]:
-            session_user["tools"] = self.get_all_tool_enums()
+            session_user["tools"] = self.get_all_tool_ids()
         self.assert_still_exists(session_user, session)
         return self.dump(session_user)
 
@@ -129,6 +155,7 @@ class UserService:
             raise REST_Exception("Your session is expired", 401)
 
     def dump(self, obj):
+        obj["tools"] = self.ids_to_enums(obj["tools"])
         return UserSchema(exclude=['_id', 'password']).dump(obj)
 
     def enums_to_ids(self, enums):
@@ -139,6 +166,6 @@ class UserService:
         return [self.db_tools.find({"_id": ObjectId(id)})["enum"]
                 for id in ids]
 
-    def get_all_tool_enums(self):
+    def get_all_tool_ids(self):
         all_tools = self.db_tools.find_all()
-        return [t["enum"] for t in all_tools]
+        return [t["_id"] for t in all_tools]
