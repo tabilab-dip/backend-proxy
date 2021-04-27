@@ -26,7 +26,7 @@ def list_all_tools():
         traceback.print_exc()
         data = dict({"title": "Server Error",
                      "subTitle": "Logs: {}".format(str(e))})
-        status = e.status
+        #status = e.status
     return get_response_json(data, status)
 
 # Auth is not needed
@@ -87,6 +87,7 @@ def update_tool(enum):
 def delete_tool(enum):
     try:
         access_tools = UserService().get_tools_user(session)
+        UserService().delete_tool(access_tools, enum)
         tool_json = ToolService().delete_tool(enum, access_tools)
         data = dict({"title": "Tool is deleted",
                      "subTitle": "Tool Info: {}".format(json.dumps(tool_json))})

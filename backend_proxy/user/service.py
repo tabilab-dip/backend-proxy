@@ -7,6 +7,7 @@ from bson.objectid import ObjectId
 import datetime as dt
 import requests
 import bcrypt
+import json
 
 
 class UserService:
@@ -27,6 +28,18 @@ class UserService:
             return user
         else:
             raise REST_Exception("Password is incorrect...")
+
+    def delete_tool(self, access_tools, enum):
+        if (access_tools is not None) and (enum not in access_tools):
+            raise REST_Exception("You have no right to update this tool")
+        users = self.db.find_all()
+        tool = self.db_tools.find({"enum": enum})
+        tool_id = str(tool["_id"])
+        for user in users:
+            if ((user["tools"] is not None) and
+                    (tool_id in user["tools"])):
+                user["tools"].remove(tool_id)
+                self.db.update({"username": user["username"]}, user)
 
     def register_user(self, req_dict, session):
         # token is needed since registration can be done only by admins
@@ -143,6 +156,7 @@ class UserService:
         else:
             tools = session_user["tools"]
             tools = [] if tools is None else tools
+            tools = self.ids_to_enums(tools)
             return tools
 
     def assert_logged_in(self, session):
