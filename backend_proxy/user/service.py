@@ -57,7 +57,10 @@ class UserService:
         pass_hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         user = {k: req_dict[k]
                 for k in ["username", "email", "roles"]}
-        user["tools"] = self.enums_to_ids(req_dict["tools"])
+        if "tools" in req_dict:
+            user["tools"] = self.enums_to_ids(req_dict["tools"])
+        else:
+            user["tools"] = []
         user["password"] = pass_hashed
         user["last_seen_at"] = dt.datetime.now()
         user["registered_at"] = user["last_seen_at"]

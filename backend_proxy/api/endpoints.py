@@ -120,7 +120,6 @@ def get_tool_ui_info(enum):
 
 @app.route("/api/tool/run/<enum>", methods=["POST"])
 def run_tool(enum):
-    print("halooo")
     try:
         # input for the tool
         input_dict = json.loads(request.data)
