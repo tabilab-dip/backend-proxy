@@ -26,7 +26,7 @@ def list_all_tools():
         traceback.print_exc()
         data = dict({"title": "Server Error",
                      "subTitle": "Logs: {}".format(str(e))})
-        #status = e.status
+        status = e.status
     return get_response_json(data, status)
 
 # Auth is not needed
@@ -35,13 +35,16 @@ def list_all_tools():
 @app.route("/api/tools/name", methods=["GET"])
 def get_tool_names():
     try:
-        data = ToolService().get_tool_names()
+        access_tools = None
+        data = ToolService().list_all_tools(access_tools)
         status = 200
     except REST_Exception as e:
+        traceback.print_exc()
         data = dict({"title": "Server Error",
                      "subTitle": "Logs: {}".format(str(e))})
         status = e.status
     return get_response_json(data, status)
+
 
 # Auth is needed
 
@@ -223,12 +226,26 @@ def register_user():
     return get_response_json(data, status)
 
 
-@app.route("/api/user/update", methods=["PUT"])
-def update_cur_user():
+@app.route("/api/user/update_info", methods=["PUT"])
+def update_cur_user_info():
     try:
         req_dict = json.loads(request.data)
-        user = UserService().update_cur_user(req_dict, session)
-        data = dict({"title": "Update success", })
+        user = UserService().update_cur_user_info(req_dict, session)
+        data = dict({"title": "Information Update success", })
+        status = 200
+    except REST_Exception as e:
+        data = dict({"title": "Server Error",
+                     "subTitle": "Logs: {}".format(str(e))})
+        status = e.status
+    return get_response_json(data, status)
+
+
+@app.route("/api/user/update_pass", methods=["PUT"])
+def update_cur_user_pass():
+    try:
+        req_dict = json.loads(request.data)
+        user = UserService().update_cur_user_pass(req_dict, session)
+        data = dict({"title": "Password Update success", })
         status = 200
     except REST_Exception as e:
         data = dict({"title": "Server Error",

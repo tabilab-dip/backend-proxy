@@ -91,14 +91,10 @@ class ToolService:
     def list_all_tools(self, access_tools):
         tools = self.db.find_all()
         if access_tools is None:
-            return [ToolSchema(only=("enum", "name", "ip", "port", "git",
-                                     "update_time", "author_json", "contact_info"))
-                    .dump(tool) for tool in tools]
+            return [self.dump(tool) for tool in tools]
         else:
             access_tools = set(access_tools)
-            return [ToolSchema(only=("enum", "name", "ip", "port", "git",
-                                     "update_time", "author_json", "contact_info"))
-                    .dump(tool) for tool in tools if tool["enum"] in access_tools]
+            return [self.dump(tool) for tool in tools if tool["enum"] in access_tools]
 
     def get_tool_names(self):
         tools = self.db.find_all()

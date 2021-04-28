@@ -72,7 +72,7 @@ class UserService:
             raise REST_Exception("You have no right to delete a user.")
         self.db.delete({"username": username})
 
-    def update_cur_user(self, req_dict, session):
+    def update_cur_user_info(self, req_dict, session):
         self.assert_logged_in(session)
         original_username = session["username"]
         target_user = self.db.find({"username": original_username})
@@ -83,16 +83,26 @@ class UserService:
                 self.db.find({"username": req_dict["username"]}) is not None):
             raise REST_Exception("Username: {} already taken"
                                  .format(req_dict["username"]))
+        for key in target_keys:
+            target_user[key] = req_dict[key]
+        target_user["last_seen_at"] = dt.datetime.now()
+        self.db.update({"username": original_username}, target_user)
+        session["username"] = req_dict["username"]
+        return self.dump(target_user)
+
+    def update_cur_user_pass(self, req_dict, session):
+        self.assert_logged_in(session)
+        original_username = session["username"]
+        target_user = self.db.find({"username": original_username})
+        self.assert_still_exists(target_user, session)
+
         password = req_dict["password1"]
         if password != req_dict["password2"]:
             raise REST_Exception("Passwords don't match.")
         pass_hashed = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
-        for key in target_keys:
-            target_user[key] = req_dict[key]
         target_user["password"] = pass_hashed
         target_user["last_seen_at"] = dt.datetime.now()
         self.db.update({"username": original_username}, target_user)
-        session["username"] = req_dict["username"]
         return self.dump(target_user)
 
     def update_other_user(self, original_username, req_dict, session):
@@ -124,6 +134,8 @@ class UserService:
         self.assert_logged_in(session)
         username = session["username"]
         session_user = self.db.find({"username": username})
+        if "admin" in session_user["roles"]:
+            return
         self.assert_still_exists(session_user, session)
         session_user["tools"].extend(self.enums_to_ids([tool_enum]))
         self.db.update({"username": username}, session_user)

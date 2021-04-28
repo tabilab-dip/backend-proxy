@@ -3,15 +3,14 @@ import sys
 import json
 import random
 import string
+import base64
 import subprocess
 
 KEYWORDS = ["panel", "about", "home", "test", ""]
 
 
 def get_specs_from_git(git_url):
-    lind = git_url.rfind("/")
-    rind = git_url.rfind(".")
-    dname = git_url[lind+1: rind]
+    dname = base64.b64encode(bytes(git_url, 'utf-8')).decode("ascii")
     dname = "backups/{}".format(dname)
     # check if folder exists, if so, delete it
     if not os.path.isdir("backups"):
