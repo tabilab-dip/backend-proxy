@@ -11,7 +11,7 @@ import traceback
 
 app = Flask(__name__)
 app.permanent_session_lifetime = timedelta(days=5)
-app.secret_key = "TODO"
+app.secret_key = "FLASK_SECRET_KEY"
 CORS(app, supports_credentials=True)
 
 
