@@ -1,14 +1,14 @@
 from pymongo import MongoClient
 
-# TODO
-url = ""
+mongo_url = "mongodb://localhost:27017/"
 
 
 class MongoConn:
     def __init__(self):
         # TODO: use local db for now
         # db name is "tools"
-        self.db = MongoClient(host="localhost", port=27017).tools
+        #self.db = MongoClient(host="localhost", port=27017).tools
+        self.db = MongoClient(mongo_url).tools
 
 
 class MongoDB(object):

@@ -1,1 +1,1 @@
-gunicorn -w 2 --chdir ./morphological_parser/ api:app -b 0.0.0.0:4444
+gunicorn -w 2  app:app -b 0.0.0.0:5000
