@@ -13,7 +13,11 @@ app = Flask(__name__)
 app.permanent_session_lifetime = timedelta(days=5)
 app.secret_key = "TODO"
 CORS(app, supports_credentials=True)
-# Auth is needed and roles specify the output
+
+
+@app.route("/api/alive", methods=["GET"])
+def alive():
+    return get_response_json("Hi", 200)
 
 
 @app.route("/api/tools", methods=["GET"])
@@ -29,8 +33,6 @@ def list_all_tools():
         status = e.status
     return get_response_json(data, status)
 
-# Auth is not needed
-
 
 @app.route("/api/tools/name", methods=["GET"])
 def get_tool_names():
@@ -44,9 +46,6 @@ def get_tool_names():
                      "subTitle": "Logs: {}".format(str(e))})
         status = e.status
     return get_response_json(data, status)
-
-
-# Auth is needed
 
 
 @app.route("/api/tool", methods=["POST"])
@@ -67,7 +66,6 @@ def add_tool():
     return get_response_json(data, status)
 
 
-# Auth is needed and roles matter
 @app.route("/api/tool/<enum>", methods=["PUT"])
 def update_tool(enum):
     try:
@@ -82,8 +80,6 @@ def update_tool(enum):
                      "subTitle": "Logs: {}".format(str(e))})
         status = e.status
     return get_response_json(data, status)
-
-# Auth is needed and roles matter
 
 
 @app.route("/api/tool/<enum>", methods=["DELETE"])
@@ -101,8 +97,6 @@ def delete_tool(enum):
         status = e.status
     return get_response_json(data, status)
 
-# Auth is not needed
-
 
 @app.route("/api/tool/ui/<enum>", methods=["GET"])
 def get_tool_ui_info(enum):
@@ -114,8 +108,6 @@ def get_tool_ui_info(enum):
                      "subTitle": "Logs: {}".format(str(e))})
         status = e.status
     return get_response_json(data, status)
-
-# Auth is not neeed
 
 
 @app.route("/api/tool/run/<enum>", methods=["POST"])
@@ -268,16 +260,9 @@ def update_other_user(username):
 
 
 def get_response_json(data, status):
-    # header = {
-    #    "content-type": "application/json",
-    #    # TODO update with original url
-    #    "Access-Control-Allow-Origin": "http://lvh.me:3000",
-    #    "Access-Control-Allow-Credentials": "true",
-    #    "Access-Control-Allow-Headers": "Origin, X-Requested-With, Content-Type, Accept, x-auth"
-    # }
     response = (json.dumps(data), status)
     return response
 
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=5000)
+    app.run(port=5000)
