@@ -26,4 +26,4 @@ def register_admin():
 if __name__ == '__main__':
     from backend_proxy.api.endpoints import *
     register_admin()
-    app.run(host='0.0.0.0', port=5000)
+    app.run(host='0.0.0.0')
